@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nume</title>
+    <title>Multi-Language Code Editor</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
@@ -15,6 +15,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/rust/rust.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/swift/swift.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/kotlin/kotlin.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/css/css.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         body, html {
@@ -25,7 +27,6 @@
             color: #fff;
             height: 100%;
             overflow: hidden;
-            cursor: none;
         }
         .container {
             position: absolute;
@@ -125,7 +126,7 @@
             color: white;
             border: none;
             border-radius: 5px;
-            cursor: none;
+            cursor: pointer;
             transition: background-color 0.3s ease;
             font-size: 10px;
             display: flex;
@@ -141,16 +142,6 @@
             top: 0;
             left: 0;
             z-index: -1;
-        }
-        #custom-cursor {
-            position: fixed;
-            width: 20px;
-            height: 20px;
-            border: 2px solid white;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 9999;
-            transition: transform 0.1s ease;
         }
         #run-result {
             height: 200px;
@@ -177,7 +168,6 @@
     </style>
 </head>
 <body>
-    <div id="custom-cursor"></div>
     <canvas id="bg-canvas"></canvas>
     <div class="container">
         <div id="editor-container">
@@ -219,7 +209,7 @@
         <h3>Select Target Language</h3>
         <select id="language-select">
             <option value="python">Python</option>
-            <option value="javascript">JavaScript</option>
+            <option value="web">Web (HTML, CSS, JS)</option>
             <option value="java">Java</option>
             <option value="cpp">C++</option>
             <option value="csharp">C#</option>
@@ -237,26 +227,11 @@
     </div>
 
     <script>
-        
-        const cursor = document.getElementById('custom-cursor');
-        document.addEventListener('mousemove', (e) => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-        });
-        document.addEventListener('mousedown', () => {
-            cursor.style.transform = 'scale(0.8)';
-        });
-        document.addEventListener('mouseup', () => {
-            cursor.style.transform = 'scale(1)';
-        });
-
-        
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
 
-       
         const particlesGeometry = new THREE.BufferGeometry();
         const particlesCount = 10000;
         const posArray = new Float32Array(particlesCount * 3);
@@ -280,7 +255,6 @@
 
         camera.position.z = 15;
 
-        
         let mouseX = 0;
         let mouseY = 0;
 
@@ -294,7 +268,6 @@
             particlesMesh.rotation.x += 0.0005;
             particlesMesh.rotation.y += 0.0005;
 
-           
             particlesMesh.rotation.x += mouseY * 0.0005;
             particlesMesh.rotation.y += mouseX * 0.0005;
 
@@ -308,7 +281,6 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-  
         const inputEditor = CodeMirror(document.getElementById("input-editor"), {
             mode: "text/plain",
             lineNumbers: true,
@@ -364,7 +336,7 @@
                 toggleViewBtn.textContent = "SI";
                 toggleViewBtn.title = "Show Input";
             } else {
-                document.getElementById("input-editor").style.opacity = 1;
+                document.getElementById("input-editor").style.opacity = 1;  // Changed from 0 to 1
                 document.getElementById("input-editor").style.pointerEvents = "auto";
                 document.getElementById("output-editor").style.opacity = 0;
                 document.getElementById("output-editor").style.pointerEvents = "none";
@@ -433,7 +405,12 @@
                 return;
             }
             const inputCode = inputEditor.getValue();
-            const prompt = `Convert the following custom syntax to valid ${currentLanguage} code:\n\n${inputCode}\n\nProvide only the converted ${currentLanguage} code without any explanations.`;
+            let prompt;
+            if (currentLanguage === 'web') {
+                prompt = `Convert the following custom syntax to a single HTML file containing HTML, CSS, and JavaScript:\n\n${inputCode}\n\nProvide only the converted HTML file without any explanations. The HTML file should include internal <style> and <script> tags for CSS and JavaScript respectively.`;
+            } else {
+                prompt = `Convert the following custom syntax to valid ${currentLanguage} code:\n\n${inputCode}\n\nProvide only the converted ${currentLanguage} code without any explanations.`;
+            }
 
             updateStatus("Converting...");
 
@@ -545,7 +522,7 @@
         function getCodeMirrorMode(language) {
             switch (language) {
                 case 'python': return 'python';
-                case 'javascript': return 'javascript';
+                case 'web': return 'htmlmixed';
                 case 'java': return 'text/x-java';
                 case 'cpp': return 'text/x-c++src';
                 case 'csharp': return 'text/x-csharp';
@@ -562,7 +539,7 @@
         function getFileExtension(language) {
             switch (language) {
                 case 'python': return 'py';
-                case 'javascript': return 'js';
+                case 'web': return 'html';
                 case 'java': return 'java';
                 case 'cpp': return 'cpp';
                 case 'csharp': return 'cs';
@@ -576,7 +553,6 @@
             }
         }
 
-  
         updateStatus("Ready");
     </script>
 </body>
