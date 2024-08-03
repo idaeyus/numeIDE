@@ -7,3 +7,4 @@
 ## https://github.com/idaeyus/numeIDE/blob/main/cookbook.md
 ## https://github.com/idaeyus/numeIDE/blob/main/info.md
 ## https://github.com/idaeyus/numeIDE/blob/main/example.txt
+#### To use GPT : https://github.com/idaeyus/numeGPT
