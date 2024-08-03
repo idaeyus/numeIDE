@@ -1,6 +1,9 @@
 # numeIDE
-Install the Nume IDE
+### Install the Nume IDE
 
-# Read https://github.com/idaeyus/numeIDE/blob/main/install.md before installing 
-### Read https://github.com/idaeyus/numeIDE/blob/main/cookbook.md before using
-### Read https://github.com/idaeyus/numeIDE/blob/main/info.md before using 
+# Important resources to read before using : 
+
+## https://github.com/idaeyus/numeIDE/blob/main/install.md 
+## https://github.com/idaeyus/numeIDE/blob/main/cookbook.md
+## https://github.com/idaeyus/numeIDE/blob/main/info.md
+## https://github.com/idaeyus/numeIDE/blob/main/example.txt
